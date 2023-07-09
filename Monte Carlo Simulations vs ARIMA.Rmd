@@ -1,0 +1,706 @@
+---
+title: "Comparing Monte Carlo Simulations and ARIMA Models for Cryptocurrency Price Prediction"
+subtitle: "Statistical Computing Final Project"
+author: "Kamaljeet Singh"
+date: ""
+output: pdf_document
+fontsize: 12pt
+---
+\rule{10.5in}{0.01in}
+
+# Abstract
+
+Due to its high volatility and decentralized nature, cryptocurrency prediction has always been a challenge. The crypto market is extremely volatile and prone to a variety of unknown causes, including shifts in market sentiment, regulatory changes, geopolitical events, and technological advancements. This makes it challenging to anticipate the price of cryptocurrencies. In this project, I want to forecast three cryptocurrencies price (Bitcoin, Ethereum, and XRP) using Monte Carlo simulations and the ARIMA (Autoregressive Integrated Moving Average) model. Then, I want to compare the two methods in terms of their prediction accuracy. To compare the prediction accuracy, I will use Mean Absolute Percentage Error (MAPE) and Root Mean Squared Error (RMSE). I will compare the two methods for predictions for the next 7, 15, and 30 days. The project will use historical data of cryptocurrencies prices to train both Monte Carlo simulations and ARIMA models. The results of this project may be helpful for cryptocurrency traders and investors who want to make wise judgments based on price forecasts.
+
+# 1. Background
+
+Although the origin of crypto can be tracked in 2009 with the launch of Bitcoin, but it captured the public's attention in late 2017, when its price reached close to 20,000 USD. Since then, a large number of other crypto currencies have been introduced by developers across the globe. Due to their volatile nature, crypto investing can be very profitable or equally detrimental to one's financial situation. In order to take a calculated decision to invest in crypto, people have been used a wide range of algorithms including Monte Carlo Simulations, Machine Learning and Deep learning  algorithms. In this project, I will use Monte Carlo Simulations and ARIMA (Autoregressive Integrated Moving Average) model to predict the price of three different cryptocurrencies and compare the two methods in terms of their prediction accuracy. Monte Carlo simulations uses random walk to predict future prices while ARIMA model predicts using the previous values of the crypto price.
+
+The data is downloaded from the website [marketwatch](https://www.marketwatch.com/investing/cryptocurrency) for Bitcoin, Ethereum and XRP. The data for each of the coin consists of date, opening price, closing price, average and high price of a day. However, for my analysis I have only used closing price of the day and I will be predicting the closing price of a day.
+
+# 2. Methodology
+
+## 2.1 Monte Carlo Simulations
+Monte Carlo simulation is a computational technique that uses random sampling to model and analyze complex systems or problems. In Monte Carlo simulations, a model of a system or process is created, and random inputs or parameters are generated to represent the uncertainty or variability in the system. The model is then run many times with different random inputs, generating a distribution of possible outcomes or results. By analyzing the distribution of outcomes, the estimate of the likelihood of different scenarios or events are calculated.  
+In price prediction problems, Monte Carlo technique is used to understand the impact of risk and uncertainty before making a decision. In our problem of predicting a crypto currency price, the first problem is to identify the underlying model. I will use the Black-Scholes model, which is is a mathematical model used to estimate the price of European-style options. The model was developed by Fischer Black and Myron Scholes in 1973 and is widely used in finance to calculate the theoretical value of options based on various inputs such as the current stock price, the strike price, time to expiration, interest rates, and volatility. The model assumes that the price of the underlying asset follows a geometric Brownian motion. The Black-Scholes model is a key tool in options trading and risk management.
+
+The Black-Scholes Model is given as $$P_t=P_0e^{\sigma W_t + (\mu -\sigma^2/2)t}$$
+$$P_t=P_{t-1}e^{\sigma Z + (\mu -\sigma^2/2)}$$
+where $\mu$ is Drift which can be defined as the direction that rates of returns have had in the past.  
+and $\sigma Z + (\mu -\sigma^2/2)$ is the Volatility, which accounts for the random variation.  
+Where $P_t$ : Price at time t (In our case,since we are dealing with daily data, t represents day)
+      $P_{t-1}$ : Price at time t-1
+
+The model can be further simplified as  $$P_t = P_{t-1}*e^r$$  
+
+Where $$r =\sigma Z + (\mu -\sigma^2/2)$$ is the Parameter of our model that is estimated using Monte Carlo Simulations.  
+and $$Z \sim N(0,1)$$
+To predict the daily return we will use the Brownian Motion which is a Stochastic process used for modelling random behavior over time.  
+
+Assessing changes in a variable over time can be a complex task. To facilitate this, one commonly used approach is calculating the "percent change", which involves subtracting one value from another and then dividing the result by a chosen reference quantity. For instance, to determine the percent change between the quantity of a variable from a particular time period and the quantity from the previous period, one can use the following formula:
+ $$percentage \ change=\frac{Y_t-Y_{t-1}}{Y_{t-1}}$$
+Regrettably, the "percent change" method is not symmetrical, meaning that computing the percentage change from a prior period to a subsequent period is not equivalent to calculating the percentage change in the opposite direction, i.e., from the subsequent period to the prior period. In other words, the direction in which the calculation is performed affects the result obtained, which is a limitation of this method.  
+An alternative method for measuring changes over time is through "log differences". Instead of using percent change, this method involves subtracting the logarithm of one quantity from the logarithm of another. The benefit of this approach is that it produces symmetrical calculations that are consistent in both directions, going forward and backward. The log difference calculated in one direction is the same as the additive inverse of the log difference in the opposite direction. This symmetrical property is an advantage over percent change, which can produce different results depending on the direction of the calculation.  
+
+## 2.2 ARIMA (Autoregressive Integrated Moving Average):
+ARIMA model is a class of linear models that forecasts future values using historical data. ARIMA stands for Autoregressive Integrated Moving Average, each of which technique contributes to the final forecast. Theoretically, ARIMA models are the most versatile class of forecasting models for time series that may be made "stationary" by differencing (if necessary). Simply said, stationarity refers to observations that are independent of time. There are three components of ARIMA:  
+
+### 2.2.1 Autoregressive(AR)
+
+In an autoregression model, we make predictions for a certain variable by combining its previous values in a linear manner. The name "autoregression" implies that we are performing a regression of the variable against itself, i.e., we use past values of the variable as predictors to estimate future values. When we refer to an autoregression model of order p, it means that we are considering p number of previous values of the variable to make our predictions for the future. The formula for an autoregression model of order p can be expressed as:
+$$Y_t=\theta_0+\theta_1Y_{t-1}+\theta_2Y_{t-2}...+\theta_pY_{t-p}$$  
+The equation that the present value of the response variable is determined by a linear combination of its past p values. The coefficients of this combination are calculated during the model fitting process. There are various techniques to identify the most suitable value of p, and one of them involves analyzing the Autocorrelation and Partial Autocorrelation plots. These methods help in determining the optimal values for p to achieve the best performance of the model.
+
+### 2.2.2 Integrated (I)
+The term "Integrated" refers to the process of differencing the data in order to make it stationary. To determine the level of differencing required, the data can be tested for stationarity using the Dickey-Fuller test, and different differencing factors can be experimented with. A differencing factor of d=1 implies taking the difference between the current observation and the previous observation (i.e., $Y_t-Y_{t-1}$).
+
+
+### 2.2.3 Moving Average (MA)
+Moving average models are different from regression models as they use past errors in forecasting future values instead of using past values of the variable of interest. The equation for a moving average model is denoted by MA(q) and can be written as follows:
+
+$$Y_t = \beta_0 + \beta_1e_{t-1} + \beta_2e_{t-2} + \beta_3e_{t-3}+…+ \beta_qe_{t-q}$$
+
+In the above equation, $e$ represents the deviations or errors between the model and the actual target variable. 
+
+The final equation of the ARIMA(p,d,q) equation is written as:
+$$Y_t=C_0+\theta_1Y^d_{t-1}+\theta_2Y^d_{t-2}...+\theta_pY^d_{t-p}  + \beta_1e_{t-1} + \beta_2e_{t-2} + \beta_3e_{t-3}+…+ \beta_qe_{t-q} + e_t$$  
+Where $Y^d_i$ represents the response variable after it has undergone d rounds of differencing.
+
+To fit an ARIMA model I have used $auto.arima()$ function in R, which give you the best parameters for the ARIMA Model.   
+
+
+## 2.3 Prediction Accuracy
+
+In order to check the prediction accuracy of the two methods, I have used two measures given as:
+
+### 2.3.1 Root Mean Square Error
+
+Root Mean Squared Error, which is a commonly used metric to evaluate the accuracy of a prediction model. It measures the difference between the predicted values of a model and the actual values, and is calculated by taking the square root of the mean of the squared differences between predicted and actual values. RMSE is a measure of the deviation of the errors between predicted and actual values, and a lower RMSE indicates a better fit between the predicted values and the actual values.
+$$RMSE=\sqrt\frac{\sum(actual-predicted)^2}{n}$$
+
+### 2.3.1 Mean Absolute Percentage Error
+
+MAPE measures the percentage difference between the predicted values of a model and the actual values. It is calculated by taking the mean of the absolute percentage differences between the predicted and actual values, where the absolute percentage difference is the absolute value of the difference between the predicted and actual values, divided by the actual value, and multiplied by 100.
+$$MAPE=\sum\frac{|actual-predicted|}{|actual|}*100/n$$
+However, for comparison purpose, I haven't multiplied the mean of the relative differences with 100.
+
+
+
+# 3. Results
+
+In order to ensure that my comparison results are not affected by the length of the data used for each coin, I have utilized different lengths of data for each coin. I have used a randomized approach where I selected different subsets of data for each coin with varying lengths. Specifically, I have used Bitcoin data from March 1, 2021 to March 15, 2023, Ethereum data
+from January 1, 2022 to March 15, 2023, and XRP data from November 1, 2022 to March 15, 2023.
+By using different lengths of data for each coin,
+I will be able to obtain more reliable comparison results that are less dependent on the length of the data. This approach also helps to find that 
+if using more data is helpful or it produce biased results by ignoring the recent trends. Overall, 
+using a randomized approach with different lengths of data for each coinis a useful technique to minimize any potential biases 
+and obtain more reliable results in my comparison between Monte Carlo simulationand ARIMA.
+ 
+For comparison, I have used data from March 16, 2023 to April 14, 2023 as my testing data.
+
+```{r, echo = FALSE}
+
+suppressPackageStartupMessages(library("dplyr"))
+suppressPackageStartupMessages(library("ggplot2"))
+suppressPackageStartupMessages(library("gridExtra"))
+suppressPackageStartupMessages(library("uroot"))
+suppressPackageStartupMessages(suppressWarnings(library("urca")))
+suppressPackageStartupMessages(suppressWarnings(library("tseries")))
+suppressPackageStartupMessages(suppressWarnings(library("forecast")))
+suppressPackageStartupMessages(library("knitr"))
+suppressPackageStartupMessages(suppressWarnings(library("kableExtra")))
+set.seed(2022)
+```
+
+```{r,echo=FALSE}
+# loading data for bitcoin
+data1<-read.csv("Download Data - CRYPTOCURRENCY_US_COINDESK_BTCUSD (3).csv")
+data2<-read.csv("Download Data - CRYPTOCURRENCY_US_COINDESK_BTCUSD (4).csv")
+data3<-read.csv("Download Data - CRYPTOCURRENCY_US_COINDESK_BTCUSD (5).csv")
+data4<-read.csv("Download Data - CRYPTOCURRENCY_US_COINDESK_BTCUSD (6).csv")
+bitcoin<-data.frame(rbind(data1,data2,data3,data4)) # combining data
+bitcoin<-distinct(bitcoin)
+bitcoin <- bitcoin %>% arrange(desc(row_number()))
+bitcoin$Close<-as.numeric(gsub(",", "", bitcoin$Close))
+bitcoin$Date<- as.Date(as.character(bitcoin$Date), format = "%m/%d/%Y")
+bitcoin<-bitcoin %>%
+ filter(bitcoin$Date >= as.Date("2021-03-01"))
+
+bitcoin_test<-tail(bitcoin, n = 30)
+bitcoin<-head(bitcoin, n = nrow(bitcoin)-30)
+
+```
+
+```{r,echo=FALSE}
+# loading data for Ethereum
+data1<-read.csv("Download Data - CRYPTOCURRENCY_US_KRAKEN_ETHUSD.csv")
+data2<-read.csv("Download Data - CRYPTOCURRENCY_US_KRAKEN_ETHUSD (1).csv")
+data3<-read.csv("Download Data - CRYPTOCURRENCY_US_KRAKEN_ETHUSD (2).csv")
+data4<-read.csv("Download Data - CRYPTOCURRENCY_US_KRAKEN_ETHUSD (3).csv")
+ethereum<-data.frame(rbind(data1,data2,data3,data4)) # combining data
+ethereum<-distinct(ethereum)
+ethereum <- ethereum %>% arrange(desc(row_number()))
+ethereum$Close<-as.numeric(gsub(",", "", ethereum$Close))
+ethereum$Date<- as.Date(as.character(ethereum$Date), format = "%m/%d/%Y")
+ethereum<-ethereum %>%
+filter(ethereum$Date >= as.Date("2022-01-01"))
+ethereum_test<-tail(ethereum, n = 30)
+ethereum<-head(ethereum, n = nrow(ethereum)-30)
+
+
+```
+
+```{r,echo=FALSE,warning=FALSE}
+# loading data for Ethereum
+data1<-read.csv("Download Data - CRYPTOCURRENCY_US_KRAKEN_XRPUSD.csv")
+data2<-read.csv("Download Data - CRYPTOCURRENCY_US_KRAKEN_XRPUSD (1).csv")
+data3<-read.csv("Download Data - CRYPTOCURRENCY_US_KRAKEN_XRPUSD (2).csv")
+data4<-read.csv("Download Data - CRYPTOCURRENCY_US_KRAKEN_XRPUSD (3).csv")
+XRP<-data.frame(rbind(data1,data2,data3,data4)) # combining data
+XRP<-distinct(XRP)
+XRP <- XRP %>% arrange(desc(row_number()))
+XRP$Close<-as.numeric(gsub(",", "", XRP$Close))
+XRP$Date<-as.Date(as.character(XRP$Date), format = "%m/%d/%Y")
+XRP<-XRP %>%
+  filter(XRP$Date >= as.Date("2022-11-01")) #22-11-1
+XRP_test<-tail(XRP, n = 30)
+XRP<-head(XRP, n = nrow(XRP)-30)
+```
+
+Here is a plot for the three coin's past performance  
+
+```{r,echo=FALSE,warning=FALSE}
+plot1<-ggplot(bitcoin, aes(x = Date, y = Close)) +
+  geom_line()+
+labs(x = "Date", y = "Price", title = "Bitcoin")
+#plot1
+plot2<-ggplot(ethereum, aes(x = Date, y = Close)) +
+  geom_line() +
+labs(x = "Date", y = "Price", title = "Ethereum")
+#plot2
+plot3<-ggplot(XRP, aes(x = Date, y = Close)) +
+  geom_line() +
+labs(x = "Date", y = "Price", title = "XRP")
+grid.arrange(plot1, plot2, plot3, ncol = 3)
+#plot3
+
+```
+
+It is very clear from the graphs of Bitcoin and Ethereum that the overall trend for the price is negative. However, upon closer analysis of the graph, it is observed that the recent trend in the price is positive. Unfortunately, the factor $\mu$ in $\sigma Z + (\mu -\sigma^2/2)$ gives equal weightage to all the price values and does not recognize the latest trend. This can potentially affect our predictions and lead to incorrect results. To address this issue, I have added an adjustment factor $\mu_{af}$ to the mean $\mu$, which is equal to the mean of the log differences of the last 15 days. Specifically,
+
+$$\mu=\mu + \mu_{af}$$
+where $\mu_{af}$ represents the mean of the log differences of the last 15 days.
+```{r, echo=FALSE}
+bitcoin_log_returns <- bitcoin %>%
+  mutate(percentage_change = (Close - lag(Close)) / lag(Close)) %>%
+  filter(!is.na(percentage_change)) %>%
+  mutate(log_returns = log(1 + percentage_change)) %>%
+  dplyr::select(log_returns)
+bitcoin_log_returns<-data.frame(bitcoin_log_returns[,1])
+```
+```{r, echo=FALSE}
+#hist(bitcoin_log_returns[,1],freq=FALSE)
+
+```
+
+```{r, echo=FALSE}
+bitcoin_log_returns<-data.frame(bitcoin_log_returns[,1])
+bit_af<-mean(bitcoin_log_returns[-(1:(nrow(bitcoin_log_returns)-15)),1]) #adjustment factor
+bit_mu = mean(bitcoin_log_returns[,1])+bit_af
+bit_var = var(bitcoin_log_returns[,1])
+bit_drift = bit_mu - (0.5*bit_var)
+
+bit_sd = sd(bitcoin_log_returns[,1])
+days = 30
+trials = 10
+X<-matrix(runif((days+1)*trials), nrow=days+1, ncol = trials)
+Z = qnorm(X) #days, trials
+bitcoin_daily_returns = exp(bit_drift + bit_sd * Z)
+#bit_drift + bit_sd * Z
+#daily_returns
+```
+
+```{r, echo=FALSE}
+bit_price = matrix(0,nrow=days+1,ncol=trials)
+bit_price[1,] = bitcoin$Close[length(bitcoin$Close)]
+#bit_price
+for (x in 2:(days+1)){
+    bit_price[x,] = bit_price[x-1,]*bitcoin_daily_returns[x,]
+}
+```
+
+```{r, echo=FALSE}
+#predicted mean bitcoin price 
+bitcoin_mean<-numeric(days)
+bit_price<-bit_price[-1,] 
+for (i in 1:days){
+  bitcoin_mean[i] = mean(bit_price[i,])
+}
+```
+
+The results from the monte carlo simulations are given in below plots:
+
+## Bitcoin 
+
+```{r, echo=FALSE}
+# Load ggplot2 package
+# Sample matrix mat
+#mat <- matrix(rnorm(100, mean = 5, sd = 2), nrow = 20, ncol = 5)
+bit_price<-t(bit_price)
+y<-head(bitcoin_test$Close,n=days)
+# Calculate the confidence interval for each column of mat
+cis <- apply(bit_price, 2, function(x) t.test(x,conf.level = 0.95)$conf.int)
+
+# Convert cis to a data frame
+cis_df <- data.frame(ci_min = cis[1,], ci_max = cis[2,], x = 1:ncol(bit_price))
+
+plot1<-ggplot(cis_df, aes(x = x, ymin = ci_min, ymax = ci_max)) +
+  geom_ribbon(alpha = 0.5, fill = "orange") +
+  geom_line(aes(y = ci_min), color = "red") +
+  geom_line(aes(y = ci_max), color = "red") +
+  labs(x = "Days", y = "Price", title = "MC 95% Confidence Band(BITCOIN)")+
+  geom_line(aes(y=y),color="green")+
+  geom_line(aes(y = y, color = "Actual Price")) +
+  scale_color_manual(values = c("Actual Price" = "green"))
+plot1
+```
+
+```{r, echo=FALSE}
+time<-c(7,15,30)
+bit_rmse<-bit_mape<-numeric(3)
+i=1
+for (x in time){
+bit_rmse[i]<-sqrt((sum((bitcoin_mean[1:x]-bitcoin_test$Close[1:x])^2))/x)
+bit_mape[i]<-mean(abs((bitcoin_mean[1:x]-bitcoin_test$Close[1:x])/bitcoin_test$Close[1:x]))
+#print(bit_mape[i])
+i<-i+1
+}
+```
+
+
+## Ethereum
+
+```{r, echo=FALSE}
+ethereum_log_returns <- ethereum %>%
+  mutate(percentage_change = (Close - lag(Close)) / lag(Close)) %>%
+  filter(!is.na(percentage_change)) %>%
+  mutate(log_returns = log(1 + percentage_change)) %>%
+  dplyr::select(log_returns)
+ethereum_log_returns<-data.frame(ethereum_log_returns[,1])
+```
+
+```{r, echo=FALSE}
+#hist(ethereum_log_returns[,1],freq=FALSE)
+
+```
+
+```{r, echo=FALSE}
+ether_af<-mean(ethereum_log_returns[-(1:(nrow(ethereum_log_returns)-15)),1]) #adjustment factor
+ether_mu = mean(ethereum_log_returns[,1]) + ether_af
+ether_var = var(ethereum_log_returns[,1])
+ether_drift = ether_mu - (0.5*ether_var)
+
+ether_sd = sd(ethereum_log_returns[,1])
+X<-matrix(runif((days+1)*trials), nrow=days+1, ncol = trials)
+Z = qnorm(X) #days, trials
+ethereum_daily_returns = exp(ether_drift + ether_sd*Z)
+#daily_returns
+```
+
+```{r, echo=FALSE}
+ether_price = matrix(0,nrow=days+1,ncol=trials)
+ether_price[1,] = ethereum$Close[length(ethereum$Close)]
+#ether_price
+for (x in 2:(days+1)){
+    ether_price[x,] = ether_price[x-1,]*ethereum_daily_returns[x,]
+}
+
+```
+
+```{r, echo=FALSE}
+#predicted mean ethereum price 
+ethereum_mean<-numeric(days)
+ether_price<-ether_price[-1,]
+for (i in 1:days){
+  ethereum_mean[i] = mean(ether_price[i,])
+}
+```
+
+
+```{r, echo=FALSE}
+# Load ggplot2 package
+# Sample matrix mat
+#mat <- matrix(rnorm(100, mean = 5, sd = 2), nrow = 20, ncol = 5)
+ether_price<-t(ether_price)
+y<-head(ethereum_test$Close,n=days)
+# Calculate the confidence interval for each column of mat
+cis <- apply(ether_price, 2, function(x) t.test(x,conf.level = 0.95)$conf.int)
+
+# Convert cis to a data frame
+cis_df <- data.frame(ci_min = cis[1,], ci_max = cis[2,], x = 1:ncol(ether_price))
+
+# Create the plot using ggplot2
+plot2<-ggplot(cis_df, aes(x = x, ymin = ci_min, ymax = ci_max)) +
+  geom_ribbon(alpha = 0.5, fill = "orange") +
+  geom_line(aes(y = ci_min), color = "red") +
+  geom_line(aes(y = ci_max), color = "red") +
+  labs(x = "Days", y = "Price", title = "MC 95% Confidence Band (ETHEREUM)")+
+  geom_line(aes(y=y),color="green")+
+  geom_line(aes(y = y, color = "Actual Price")) +
+  scale_color_manual(values = c("Actual Price" = "green"))
+plot2
+```
+
+
+```{r, echo=FALSE}
+ether_rmse<-ether_mape<-numeric(3)
+i=1
+for (x in time){
+ether_rmse[i]<-sqrt((sum((ethereum_mean[1:x]-ethereum_test$Close[1:x])^2))/x)
+ether_mape[i]<-mean(abs((ethereum_mean[1:x]-ethereum_test$Close[1:x])/ethereum_test$Close[1:x]))
+#print(ether_mape[i])
+i<-i+1
+}
+```
+## XRP
+
+```{r, echo=FALSE}
+XRP_log_returns <- XRP %>%
+  mutate(percentage_change = (Close - lag(Close)) / lag(Close)) %>%
+  filter(!is.na(percentage_change)) %>%
+  mutate(log_returns = log(1 + percentage_change)) %>%
+  dplyr::select(log_returns)
+XRP_log_returns<-data.frame(XRP_log_returns[,1])
+```
+
+```{r, echo=FALSE}
+#hist(XRP_log_returns[,1],freq=FALSE)
+
+```
+
+```{r, echo=FALSE}
+XRP_af<-mean(ethereum_log_returns[-(1:(nrow(ethereum_log_returns)-15)),1]) #adjustment factor
+XRP_mu = mean(XRP_log_returns[,1])+XRP_af
+XRP_var = var(XRP_log_returns[,1])
+XRP_drift = XRP_mu - (0.5*XRP_var)
+
+XRP_sd = sd(XRP_log_returns[,1])
+X<-matrix(runif((days+1)*trials), nrow=days+1, ncol = trials)
+Z = qnorm(X) #days, trials
+XRP_daily_returns = exp(XRP_drift + XRP_sd*Z)
+#daily_returns
+```
+
+```{r, echo=FALSE}
+XRP_price = matrix(0,nrow=days+1,ncol=trials)
+XRP_price[1,] = XRP$Close[length(XRP$Close)]
+#XRP_price
+for (x in 2:(days+1)){
+    XRP_price[x,] = XRP_price[x-1,]*XRP_daily_returns[x,]
+}
+```
+
+```{r, echo=FALSE}
+#predicted mean XRP price 
+XRP_mean<-numeric(days)
+XRP_price<-XRP_price[-1,]
+for (i in 1:days){
+  XRP_mean[i] = mean(XRP_price[i,])
+}
+```
+
+```{r, echo=FALSE}
+# Load ggplot2 package
+# Sample matrix mat
+#mat <- matrix(rnorm(100, mean = 5, sd = 2), nrow = 20, ncol = 5)
+XRP_price<-t(XRP_price)
+y<-head(XRP_test$Close,n=days)
+# Calculate the confidence interval for each column of mat
+cis <- apply(XRP_price, 2, function(x) t.test(x,conf.level = 0.95)$conf.int)
+
+# Convert cis to a data frame
+cis_df <- data.frame(ci_min = cis[1,], ci_max = cis[2,], x = 1:ncol(XRP_price))
+
+# Create the plot using ggplot2
+plot3<-ggplot(cis_df, aes(x = x, ymin = ci_min, ymax = ci_max)) +
+  geom_ribbon(alpha = 0.5, fill = "orange") +
+  geom_line(aes(y = ci_min), color = "red") +
+  geom_line(aes(y = ci_max), color = "red") +
+  labs(x = "Days", y = "Price", title = "MC 95% Confidence Band(XRP)")+
+  geom_line(aes(y=y),color="green")+
+  geom_line(aes(y = y, color = "Actual Price")) +
+  scale_color_manual(values = c("Actual Price" = "green"))
+plot3
+#grid.arrange(plot1, plot2, plot3, ncol = 3)
+
+```
+
+
+```{r, echo=FALSE}
+XRP_rmse<-XRP_mape<-numeric(3)
+i=1
+for (x in time){
+XRP_rmse[i]<-sqrt((sum((XRP_mean[1:x]-XRP_test$Close[1:x])^2))/x)
+XRP_mape[i]<-mean(abs((XRP_mean[1:x]-XRP_test$Close[1:x])/XRP_test$Close[1:x]))
+#print(XRP_mape[i])
+i<-i+1
+}
+```
+## ARIMA
+
+I have used $auto.arima()$ function to identify the best parameters for the ARIMA model. Here are the model suggested by $auto.arima()$ and its corresponding parameters for different cryptocurrencies:
+
+### Bitcoin  
+
+```{r, echo=FALSE}
+#adf.test(bitcoin$Close)
+#data not stationary
+#convert data to stationary
+#bit_diff<-diff(log(bitcoin$Close))
+
+#adf.test(bit_diff)
+#plot.ts(bit_diff)
+
+auto.arima(bitcoin$Close)
+```
+
+### Ethereum  
+
+```{r,echo=FALSE}
+#adf.test(ethereum$Close)
+#data not sttaionary
+#convert data to stationary
+#ether_diff<-diff(log(ethereum$Close))
+
+#adf.test(ether_diff)
+#plot.ts(bit_diff)
+
+suppressWarnings(auto.arima(ethereum$Close))
+
+```
+
+### XRP
+
+```{r,echo=FALSE}
+#adf.test(XRP$Close)
+#data not sttaionary
+#convert data to stationary
+#XRP_diff<-diff(log(XRP$Close))
+
+#adf.test(XRP_diff)
+#plot.ts(bit_diff)
+
+auto.arima(XRP$Close)
+
+
+```
+
+```{r, echo=FALSE}
+bit_model<-arima(bitcoin$Close,order=c(2,1,3))
+bit_residuals<-residuals(bit_model)
+
+ether_model<-arima(ethereum$Close,order=c(1,1,1))
+#bit_diff<-
+ether_residuals<-residuals(ether_model)
+XRP_model<-arima(XRP$Close,order=c(1,0,0))
+#bit_diff<-
+XRP_residuals<-residuals(XRP_model)
+
+
+#bit_diff<-
+#par(mar = c(1, 1, 1, 1))
+#plot(bit_residuals)
+#plot(bit_forecast_values)
+```
+
+## ARIMA Diagnostics
+For checking the residuals of our fitteed ARIMA model's, let's first check the histogram's of the residuals.  
+
+
+```{r, echo=FALSE}
+hist1<-gghistogram(bit_residuals,add.normal = TRUE)+
+xlab("Residuals (ARIMA Bitcoin)") + 
+  ylab("Frequency") +
+ggtitle("Bitcoin")
+
+hist2<-gghistogram(ether_residuals,add.normal = TRUE)+
+xlab("Residuals (ARIMA Ethereum)") + 
+  ylab("Frequency") +
+ggtitle("Ethereum")
+
+hist3<-gghistogram(XRP_residuals,add.normal = TRUE)+
+xlab("Residuals (ARIMA XRP)") + 
+  ylab("Frequency") +
+ggtitle("XRP")
+grid.arrange(hist1, hist2, hist3, ncol = 3)
+```
+After fitting the ARIMA model's for all the three cryptocurrencies, I tested the residuals for the presence of autocorrelation in the residuals. For this, I have used Box-Pierce test which is commonly used after fitting an ARIMA model to a time series data to test for the presence of autocorrelation in the residuals. The null hypothesis is that the residuals are uncorrelated (i.e., independent).  
+
+```{r, echo=FALSE}
+# Box-Pierce and Ljung-Box Test
+
+Box.test(bit_residuals,type=c("Box-Pierce","Ljung-Box"))
+
+
+Box.test(ether_residuals,lag=10,type=c("Box-Pierce","Ljung-Box"))
+
+
+
+Box.test(XRP_residuals,lag=10,type=c("Box-Pierce","Ljung-Box"))
+#checkresiduals(bit_model)
+```
+
+Clearly all the p-values are significant, hence our Null Hypothesis of no correlation is not rejected.  
+
+Moreover, I have also used Autocorrelation function (ACF) plot of the residuals, which  is one of the most common tools used to diagnose whether the residuals of the ARIMA model exhibit any significant autocorrelation.
+
+```{r, echo=FALSE}
+#ACF plot
+par(mfrow = c(1, 3))
+acf(bit_residuals)
+acf(ether_residuals)
+acf(XRP_residuals)
+
+
+```
+
+All the diagnostics test does not indicate any problem in pur fitted models. Hence we are can use our fitted ARIMA models for prediction.
+
+```{r,echo=FALSE}
+#prediction
+bit_forecast_values <- forecast(bit_model, h=days)
+bit_predicted_values <- as.numeric(bit_forecast_values$mean)
+
+ether_forecast_values <- forecast(ether_model, h=days)
+ether_predicted_values <- as.numeric(ether_forecast_values$mean)
+
+
+XRP_forecast_values <- forecast(XRP_model, h=days)
+XRP_predicted_values <- as.numeric(XRP_forecast_values$mean)
+
+```
+
+Here are our final tables for comparison of RMSE and MAPE for diiferent methods and coins :
+
+
+
+```{r, echo=FALSE}
+bit_rmse_arima<-bit_mape_arima<-numeric(3)
+i=1
+for (x in time){
+bit_rmse_arima[i]<-sqrt((sum((bit_predicted_values[1:x]-bitcoin_test$Close[1:x])^2))/x)
+bit_mape_arima[i]<-mean(abs((bit_predicted_values[1:x]-bitcoin_test$Close[1:x])/bitcoin_test$Close[1:x]))
+#print(bit_mape_arima[i])
+i<-i+1
+}
+```
+```{r, echo=FALSE}
+
+
+```
+
+
+```{r, echo=FALSE}
+ether_rmse_arima<-ether_mape_arima<-numeric(3)
+i=1
+for (x in time){
+ether_rmse_arima[i]<-sqrt((sum((ether_predicted_values[1:x]-ethereum_test$Close[1:x])^2))/x)
+ether_mape_arima[i]<-mean(abs((ether_predicted_values[1:x]-ethereum_test$Close[1:x])/ethereum_test$Close[1:x]))
+#print(ether_mape_arima[i])
+i<-i+1
+}
+```
+
+
+```{r, echo=FALSE}
+XRP_rmse_arima<-XRP_mape_arima<-numeric(3)
+i=1
+for (x in time){
+XRP_rmse_arima[i]<-sqrt((sum((XRP_predicted_values[1:x]-XRP_test$Close[1:x])^2))/x)
+XRP_mape_arima[i]<-mean(abs((XRP_predicted_values[1:x]-XRP_test$Close[1:x])/XRP_test$Close[1:x]))
+#print(XRP_mape_arima[i])
+i<-i+1
+}
+```
+
+```{r, echo=FALSE}
+bitcoin_results_rmse<-data.frame(rbind(bit_rmse,bit_rmse_arima))
+rownames(bitcoin_results_rmse)<-c("MC","ARIMA")
+colnames(bitcoin_results_rmse)<-c("7 Days","15 Days","30 Days")
+#kable(bitcoin_results,align = c("l", "r", "c"), caption = "My Table", digits = 2)
+kable(bitcoin_results_rmse,caption = "BITCOIN (RMSE)") %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE,,latex_options = "HOLD_position")
+bitcoin_results_mape<-data.frame(rbind(bit_mape,bit_mape_arima))
+rownames(bitcoin_results_mape)<-c("MC","ARIMA")
+colnames(bitcoin_results_mape)<-c("7 Days","15 Days","30 Days")
+kable(bitcoin_results_mape,caption = "BITCOIN (MAPE)") %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+
+```
+
+```{r, echo=FALSE}
+ether_results_rmse<-data.frame(rbind(ether_rmse,ether_rmse_arima))
+rownames(ether_results_rmse)<-c("MC","ARIMA")
+colnames(ether_results_rmse)<-c("7 Days","15 Days","30 Days")
+#kable(ether_results,align = c("l", "r", "c"), caption = "My Table", digits = 2)
+kable(ether_results_rmse,caption = "ETHEREUM (RMSE)") %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+ether_results_mape<-data.frame(rbind(ether_mape,ether_mape_arima))
+rownames(ether_results_mape)<-c("MC","ARIMA")
+colnames(ether_results_mape)<-c("7 Days","15 Days","30 Days")
+
+kable(ether_results_mape,caption = "ETHEREUM (MAPE)") %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+
+```
+
+```{r, echo=FALSE}
+XRP_results_rmse<-data.frame(rbind(XRP_rmse,XRP_rmse_arima))
+rownames(XRP_results_rmse)<-c("MC","ARIMA")
+colnames(XRP_results_rmse)<-c("7 Days","15 Days","30 Days")
+#kable(XRP_results,align = c("l", "r", "c"), caption = "My Table", digits = 2)
+kable(XRP_results_rmse,caption = "XRP (RMSE)") %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+XRP_results_mape<-data.frame(rbind(XRP_mape,XRP_mape_arima))
+rownames(XRP_results_mape)<-c("MC","ARIMA")
+colnames(XRP_results_mape)<-c("7 Days","15 Days","30 Days")
+kable(XRP_results_mape,caption = "XRP (MAPE)") %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+```
+
+
+# 4. Conclusion
+
+It is observed that the results for RMSE and MAPE are heading in same direction for the two methods. Hence the final conclusion table can be summarized in one table is given as 
+
+```{r,echo=FALSE}
+result=matrix(NA,nrow=3,ncol=4)
+rownames(result) = c("Bitcoin", "Ethereum", "XRP")
+colnames(result) = c("7 Days","15 Days"," 30 Days", "Data Length")
+result[1,]<-c("Monte Carlo","Monte Carlo","Monte Carlo",nrow(bitcoin))
+result[2,]<-c("ARIMA","ARIMA","ARIMA",nrow(ethereum))
+result[3,]<-c("ARIMA","ARIMA","ARIMA",nrow(XRP))
+
+result <- as.data.frame(result)
+# Display the data frame as a table using kable
+kable(result,caption = "Final Results")%>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE,latex_options = "HOLD_position") 
+
+```
+
+Based on the final result table, it is observed that the performance of the two methods varied across the different cryptocurrencies. For Bitcoin, Monte Carlo Simulation method appeared to be a better fit for the data as compared to the ARIMA model. However, for Ethereum and XRP, ARIMA is observed to perform better. Therefore, it can be concluded that the choice of method may depend on the specific characteristics of the data being analyzed. It is important to carefully evaluate the performance of different methods for each individual case in order to make informed decisions about the most appropriate approach. The main points of the results can be summarized as below:
+\begin{itemize}
+  \item 1. Monte Carlo Simulation performs better if we have data of very large length as compared to ARIMA.
+  \item 2. The results of the Monte Carlo Simulation also depends upon the adjustment factor (Volatility factor), which should be chosen carefully.
+  \item 3. The predictions from ARIMA appears to be converging to the mean, which may not be a good estimates for a long term prediction.
+\end{itemize}
+
+
+## Reference 
+1. Effectivness of Monte Carlo Simulation and ARIMA Model in Predicting Stock Prices by Almira Arnaut-Berilo, Azra Zaimović, Nedzmija Turbo-Merdan.  
+
+2. [Monte Carlo Simulations for Stock Price Predictions](https://medium.com/analytics-vidhya/monte-carlo-simulations-for-predicting-stock-prices-python-a64f53585662)  
+
+3. [How to Use Monte Carlo Simulation With GBM](https://www.investopedia.com/articles/07/montecarlo.asp)  
+
+4. [Stock price prediction using ARIMA Model](https://medium.com/@derejeabera/stock-price-prediction-using-arima-model-251ddb4ee52a)
